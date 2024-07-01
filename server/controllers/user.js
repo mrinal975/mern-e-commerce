@@ -16,6 +16,8 @@ const registerUser = async (req, res) => {
   const hashPassword = await bcrypt.hash(data.password, 10);
   data.password = hashPassword;
 
+  const userObject = new User(data);
+  await userObject.save();
   const otp = Math.floor(100000 + Math.random() * 900000);
 
   const activationToken = jwt.sign({ data, otp }, process.env.JWT_SECRET, {
@@ -23,8 +25,6 @@ const registerUser = async (req, res) => {
   });
   await sendMail(data.email, "OTP", `Your OTP is ${otp}`);
   res.status(200).json({ msg: "OTP sent", activationToken });
-  console.log("registerUser user");
-  res.status(200).json(data);
 };
 
 const loginUser = async (req, res) => {
