@@ -7,7 +7,7 @@ dbConnection;
 
 const app = express();
 app.use(express.json());
-app.use(routes);
+app.use("/api", routes);
 
 app.listen(process.env.PORT, () => {
   console.log("Listening on port 3000");

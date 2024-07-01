@@ -17,12 +17,12 @@ const userSchemaValidation = {
       },
       errorMessage: "Password must be at least 6 characters long",
     },
-    name: {
-      notEmpty: true,
-      errorMessage: "Name is required",
-      isString: {
-        errorMessage: "Name must be a string",
-      },
+  },
+  name: {
+    notEmpty: true,
+    errorMessage: "Name is required",
+    isString: {
+      errorMessage: "Name must be a string",
     },
   },
 };
