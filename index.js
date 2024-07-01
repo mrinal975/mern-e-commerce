@@ -3,7 +3,7 @@ import routes from "./server/routes/index.js";
 import { configDotenv } from "dotenv";
 import dbConnection from "./server/database/DB.js";
 configDotenv();
-dbConnection;
+dbConnection();
 
 const app = express();
 app.use(express.json());
