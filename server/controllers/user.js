@@ -57,9 +57,15 @@ const loginUser = async (req, res) => {
     return res.status(422).json({ error: "Invalid Password" });
   }
   const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "15d",
   });
-  return res.status(200).json({ msg: "login success", token });
+  return res.status(200).json({ msg: "login success", token, userData });
 };
 
-export { registerUser, loginUser, verifyUser };
+const profile = async (req, res) => {
+  const { id } = req.user;
+  const userData = await User.findById(id);
+  return res.status(200).json({ userData });
+};
+
+export { registerUser, loginUser, verifyUser, profile };
