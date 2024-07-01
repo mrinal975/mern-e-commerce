@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 const schema = new mongoose.Schema(
   {
     name: {
@@ -22,4 +24,4 @@ const schema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("uses", schema);
+export const User = mongoose.model("uses", schema);
