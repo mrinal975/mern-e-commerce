@@ -15,20 +15,51 @@ const registerUser = async (req, res) => {
   }
   const hashPassword = await bcrypt.hash(data.password, 10);
   data.password = hashPassword;
-
-  const userObject = new User(data);
-  await userObject.save();
   const otp = Math.floor(100000 + Math.random() * 900000);
 
   const activationToken = jwt.sign({ data, otp }, process.env.JWT_SECRET, {
     expiresIn: "50m",
   });
   await sendMail(data.email, "OTP", `Your OTP is ${otp}`);
-  res.status(200).json({ msg: "OTP sent", activationToken });
+  return res.status(200).json({ msg: "OTP sent", activationToken });
+};
+
+const verifyUser = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(422).json({ error: error.array() });
+  }
+  const { activationToken, otp } = matchedData(req);
+  const verify = jwt.verify(activationToken, process.env.JWT_SECRET);
+  if (!verify) {
+    return res.status(422).json({ error: "Invalid Token" });
+  }
+  console.log("------", verify, otp);
+  if (verify.otp != otp) {
+    return res.status(422).json({ error: "Invalid OTP" });
+  }
+  await User.create(verify.data);
+  return res.status(200).json({ msg: "User created" });
 };
 
 const loginUser = async (req, res) => {
-  console.log("login user");
-  res.status(200).json({ msg: "hello" });
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(422).json({ error: error.array() });
+  }
+  const { email, password } = matchedData(req);
+  const userData = await User.findOne({ email });
+  if (!userData) {
+    return res.status(422).json({ error: "Invalid Email" });
+  }
+  const validPassword = await bcrypt.compare(password, userData.password);
+  if (!validPassword) {
+    return res.status(422).json({ error: "Invalid Password" });
+  }
+  const token = jwt.sign({ id: userData._id }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+  return res.status(200).json({ msg: "login success", token });
 };
-export { registerUser, loginUser };
+
+export { registerUser, loginUser, verifyUser };
