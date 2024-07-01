@@ -1,7 +1,6 @@
 import { createTransport } from "nodemailer";
 
-const sendMail = async (req, res, next) => {
-  const { text, subject, to } = req.body;
+const sendMail = async (to, subject, text) => {
   const transporter = createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -10,12 +9,15 @@ const sendMail = async (req, res, next) => {
       pass: process.env.MAIL_PASS,
     },
   });
+
+  // send mail with defined transport object
   const mailOptions = {
     from: process.env.MAIL_USER,
     to,
     subject,
     text,
   };
+  console.log(to, subject, text);
   await transporter.sendMail(mailOptions);
 };
 
